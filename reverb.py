@@ -74,13 +74,11 @@ buffer = RingBuffer(delay)
 outsignal = []
 for (i, s) in enumerate(psignal):
     if i < delay:
-        sout = (1 - wet) * s
+        sdelay = 0
     else:
-        sout = (1 - wet) * s + wet * buffer.dequeue()
-    outsignal.append((1 - reverb) * s + reverb * sout)
-    buffer.enqueue(s)
-while not buffer.is_empty():
-    outsignal.append(wet * buffer.dequeue())
+        sdelay = buffer.dequeue()
+    outsignal.append((1 - wet) * s + wet * sdelay)
+    buffer.enqueue((1 - reverb) * s + reverb * sdelay)
 outsignal = np.array(outsignal)
 
 outfile = open(args.outfile, "wb")
